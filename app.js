@@ -27,6 +27,11 @@ function safeImageUrl(raw) {
   }
 }
 
+// Smaller Google Drive thumbnail for cards & cart (saves mobile data)
+function thumbUrl(url) {
+  return String(url || '').replace('sz=w600', 'sz=w240');
+}
+
 // Cart persistence (per store, survives refresh)
 const CART_KEY = `foodcart_cart_${clientId}`;
 function saveCart() {
@@ -420,7 +425,7 @@ function renderItemCard(item) {
         <div class="w-[92px] shrink-0 flex flex-col items-center">
           <button type="button" onclick="openLightbox('${item.id}')" class="relative w-[92px] h-[92px] rounded-xl bg-slate-200 overflow-hidden block focus:outline-none">
             <img
-              src="${esc(item.image)}"
+              src="${esc(thumbUrl(item.image))}"
               alt="${esc(item.name)}"
               width="92"
               height="92"
@@ -455,6 +460,7 @@ function openLightbox(itemId) {
   lbFallback.classList.add('hidden');
   lbImg.classList.remove('hidden');
   lbImg.className = `w-full h-full object-cover ${isSoldOut ? 'grayscale opacity-60' : ''}`;
+  lbImg.removeAttribute('src');
   lbImg.src = item.image;
   lbImg.alt = item.name;
   lbImg.onerror = () => {
@@ -601,7 +607,7 @@ function renderCheckoutModal() {
 
   document.getElementById('modalCartItems').innerHTML = entries.map(([key, e]) => {
     const thumbHtml = e.item.image
-      ? `<img src="${esc(e.item.image)}" alt="" width="40" height="40" loading="lazy" decoding="async" onerror="this.style.display='none'" class="w-10 h-10 rounded-lg object-cover bg-slate-200 shrink-0" />`
+      ? `<img src="${esc(thumbUrl(e.item.image))}" alt="" width="40" height="40" loading="lazy" decoding="async" onerror="this.style.display='none'" class="w-10 h-10 rounded-lg object-cover bg-slate-200 shrink-0" />`
       : '';
     return `
       <div class="py-3 flex items-center justify-between gap-2.5">
