@@ -2,7 +2,7 @@
 // MULTI-CLIENT REGISTRY (?id=malabar)
 // ==========================================
 const CLIENTS = {
-  malabar: "https://script.google.com/macros/s/AKfycbwmmAdVYs25ryvZp-ds3-n3xoXD_Xyspuz9Kqa1WcuM9VLJwckDGYmTPt0K8wHoaERd/exec",
+  malabar: "https://script.google.com/macros/s/AKfycbz_oHHgJzRMtuwGzY6I1TQ7eIn_WJVKCShpAe_IYmJa83lUbhgIqt9fAU24-b6lqPA7/exec",
   // Add new clients below:
   // alfahamhub: "YOUR_NEXT_CLIENT_WEB_APP_URL",
 };
