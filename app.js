@@ -1,15 +1,8 @@
 // ==========================================
-// MULTI-CLIENT REGISTRY (?id=malabar)
+// SHOP DATA (injected by the Cloudflare Function at /<slug>)
 // ==========================================
-const CLIENTS = {
-  malabar: "https://script.google.com/macros/s/AKfycbz_oHHgJzRMtuwGzY6I1TQ7eIn_WJVKCShpAe_IYmJa83lUbhgIqt9fAU24-b6lqPA7/exec",
-  // Add new clients below:
-  // alfahamhub: "YOUR_NEXT_CLIENT_WEB_APP_URL",
-};
-
-const urlParams = new URLSearchParams(window.location.search);
-const clientId = (urlParams.get("id") || "").toLowerCase().trim();
-const API_URL = clientId ? CLIENTS[clientId] : null;
+const SHOP = window.__SHOP__ || null;
+const clientId = SHOP ? SHOP.slug : '';
 
 // Escape text coming from the Google Sheet before putting it in HTML
 const esc = s => String(s ?? '').replace(/[&<>"']/g,
@@ -121,28 +114,28 @@ function computeStoreOpenState() {
 }
 
 async function init() {
-  // Show default FoodCart screen when no ?id= parameter is provided
-  if (!clientId) {
+  // Home page (/) shows the FoodCart landing screen
+  const path = location.pathname.replace(/^\/+|\/+$/g, '');
+  if (!path) {
     document.getElementById('landingScreen').classList.remove('hidden');
     return;
   }
 
-  // Otherwise show Store Menu App
   document.getElementById('storeApp').classList.remove('hidden');
 
-  if (!API_URL) {
+  // Unknown shop link
+  if (!SHOP) {
     document.getElementById('skeleton').innerHTML = `
       <div class="p-6 text-center bg-white rounded-2xl border border-red-100 text-red-600 text-sm font-semibold space-y-3">
-        <p>Store ID "<strong>${esc(clientId)}</strong>" not found. Please check the QR link.</p>
-        <a href="./" class="inline-block text-xs font-bold text-orange-600 underline">← Back to FoodCart Home</a>
+        <p>Store "<strong>${esc(path)}</strong>" not found. Please check the link or QR code.</p>
+        <a href="/" class="inline-block text-xs font-bold text-orange-600 underline">← Back to FoodCart Home</a>
       </div>`;
     return;
   }
 
   try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    if (!data.ok) throw new Error('Invalid API response');
+    const data = SHOP.data;
+    if (!data || !data.ok) throw new Error('No menu data');
     settings = data.settings || {};
     menuItems = (data.items || []).map(it => ({
       ...it,
@@ -157,7 +150,7 @@ async function init() {
   } catch (err) {
     document.getElementById('skeleton').innerHTML = `
       <div class="p-6 text-center bg-white rounded-2xl border border-red-100 text-red-600 text-sm font-semibold">
-        Unable to load menu. Please check API URL or internet connection.
+        Unable to load the menu right now. <a href="" onclick="location.reload();return false" class="underline">Tap to reload</a>
       </div>`;
   }
 }
